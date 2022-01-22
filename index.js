@@ -83,14 +83,15 @@ getUserCommand = async () => {
                 
                 // Return list of servers
                 console.log(clientguilds.map(g => {
-                    return `\nServers:\n${g.name}: ${g.id}\n⮩${
+                    return `\n\n${g.name}: ${g.id}\n${
                         // Get the channels
                         g.channels.cache.filter(c => {
                             // Make sure we are listing a text channel.
                             return (c.type == 'GUILD_TEXT')
                         }).map(c => {
-                            return `${c.name}: ${c.id}`;
-                        }).join('\n⮩')
+                            return `- ${c.name}: ${c.id} ${c.nsfw ? ' [NSFW]' : ''} (in ${c.parent.name})`;
+                            //c.
+                        }).join('\n')
                     }`;
                 }).join('\n\n'));
 
@@ -119,7 +120,7 @@ getUserCommand = async () => {
                     break;
                 }
 
-                console.log(`In channel ${channel.name} (server ${channel.guild})`.green);
+                console.log(`In channel ${channel.name} (server '${channel.guild}')`.green);
 
                 break;
             case 'togglebots':
