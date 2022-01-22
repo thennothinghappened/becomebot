@@ -3,5 +3,5 @@ This is a program that allows you to use a bot as though they are a regular user
 *Do not use this program outside this circumstance, as this could get you banned.*
 
 # How do I run the program?
-The first time you boot, it will create an empty file called `token`.
+The first time you boot, it will create a json file called `config.json`.
 In this file, write the token of the bot you are using. Rerunning the program, the bot will be logged into.
