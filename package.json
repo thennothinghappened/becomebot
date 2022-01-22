@@ -9,6 +9,7 @@
   "author": "thennothing",
   "license": "ISC",
   "dependencies": {
+    "colors": "^1.4.0",
     "discord.js": "^13.6.0"
   }
 }
