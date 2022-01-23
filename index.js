@@ -72,7 +72,13 @@ getUserCommand = async () => {
                     break;
                 }
 
-                console.log(`Trying to send message '${args}'`);
+                // Check if we can go there.
+                if (!channel.permissionsFor(client.user).toArray().includes('SEND_MESSAGES')) {
+                    console.log('We don\'t have permission to send messages in the channel.'.red);
+                    break;
+                }
+
+                //console.log(`Trying to send message '${args}'`);
                 await channel.send(args);
                 
 
@@ -82,18 +88,24 @@ getUserCommand = async () => {
                 let clientguilds = client.guilds.cache;
                 
                 // Return list of servers
-                console.log(clientguilds.map(g => {
-                    return `\n\n${g.name}: ${g.id}\n${
-                        // Get the channels
-                        g.channels.cache.filter(c => {
-                            // Make sure we are listing a text channel.
-                            return (c.type == 'GUILD_TEXT')
-                        }).map(c => {
-                            return `- ${c.name}: ${c.id} ${c.nsfw ? ' [NSFW]' : ''} (in ${c.parent.name})`;
-                            //c.
-                        }).join('\n')
-                    }`;
-                }).join('\n\n'));
+                clientguilds.map(g => {
+                    console.log(`\n${g.name}: ${g.id}`);
+
+                    let table = [];
+
+                    g.channels.cache.filter(c => c.type == 'GUILD_TEXT').map(c => {
+                        let perms = c.permissionsFor(client.user).toArray();
+                        table.push({
+                            'Name': c.name,
+                            'ID': c.id, //parseInt(c.id), (TODO: for some reason parseInt() breaks this?)
+                            'NSFW': c.nsfw > 0 ? 'Yes' : 'No',
+                            'Read-Only': !perms.includes('SEND_MESSAGES') ? 'Yes' : 'No',
+                            'Private': !perms.includes('VIEW_CHANNEL') ? '🔒' : '🔑'
+                        });
+                    });
+                    
+                    console.table(table);
+                });
 
                 break;
             case 'goto':
@@ -109,8 +121,17 @@ getUserCommand = async () => {
                     break;
                 }
                 
+                let perms = new_channel.permissionsFor(client.user).toArray();
+
+                // Check if we can go there.
+                if (!perms.includes('VIEW_CHANNEL')) {
+                    console.log('We don\'t have permission to view the channel.'.red);
+                    break;
+                }
+
                 channel = new_channel;
-                console.log(`Now in channel ${channel.name} (server '${channel.guild}')`.green);
+
+                console.log(`Now in channel ${channel.name} (server '${channel.guild}')`.green+`\nCan send messages: ${perms.includes('SEND_MESSAGES') ? 'Yes': 'No'}\n`);
 
                 break;
             case 'channel':
@@ -138,7 +159,7 @@ getUserCommand = async () => {
         }
 
     } catch(e) {
-        console.error('Failed to prompt user.'.red, e);
+        console.error('Error on action: '.red, e);
     }
 
     getUserCommand();
