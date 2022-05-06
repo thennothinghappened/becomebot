@@ -132,6 +132,7 @@ getUserCommand = async () => {
                 channel = new_channel;
 
                 console.log(`Now in channel ${channel.name} (server '${channel.guild}')`.green+`\nCan send messages: ${perms.includes('SEND_MESSAGES') ? 'Yes': 'No'}\n`);
+                console.log(await fetch_num_msgs(process.stdout.rows-5));
 
                 break;
             case 'channel':
@@ -144,6 +145,23 @@ getUserCommand = async () => {
                 console.log(`In channel ${channel.name} (server '${channel.guild}')`.green);
 
                 break;
+            
+            case 'msgs':
+                // Get x num of messages in channel
+
+                if (args == '') {
+                    console.log('Usage: msgs <num>'.red);
+                    break;
+                }
+                if (channel == false) {
+                    console.log('Not in a channel.'.red);
+                    break;
+                }
+
+                console.log(await fetch_num_msgs(parseInt(args)));
+
+                break;
+
             case 'togglebots':
                 // Toggle whether messages from bots should be read.
                 hear_bots = !hear_bots;
@@ -154,7 +172,7 @@ getUserCommand = async () => {
                 process.exit(0);
 
             default:
-                console.log('\nCommands:\nhelp: Display this message\nsend: Send a message in the current channel\nlist: List all channels the bot is in\ngoto: Go to a channel by id\nchannel: Name the current channel and server\ntogglebots: Enable/Disable bot messages being listened to\nexit: Close the program\n');
+                console.log('\nCommands:\nhelp: Display this message\nsend: Send a message in the current channel\nlist: List all channels the bot is in\ngoto: Go to a channel by id\nchannel: Name the current channel and server\nmsgs: get x num of messages in current channel\ntogglebots: Enable/Disable bot messages being listened to\nexit: Close the program\n');
                 break;
         }
 
@@ -163,4 +181,15 @@ getUserCommand = async () => {
     }
 
     getUserCommand();
+}
+
+async function fetch_num_msgs(n) {
+    _msgs = '';
+    await channel.messages.fetch({limit: n}).then(messages => {
+        messages.reverse().forEach(msg => {
+            _msgs += `${msg.author.tag}`.blue+`${msg.author.bot ? '[BOT]' : ''}: ${msg.content}\n`.white;
+        })
+    });
+
+    return _msgs;
 }
